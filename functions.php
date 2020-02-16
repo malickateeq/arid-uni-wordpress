@@ -12,6 +12,7 @@ function uni_resources()
 
     wp_localize_script('main-uni-js', 'uni_data', array(
         'root_url' => get_site_url(),
+        'nonce' => wp_create_nonce('wp_rest'),
     ));
 }
 add_action('wp_enqueue_scripts', 'uni_resources');
