@@ -1,6 +1,7 @@
 <?php
 
 require get_theme_file_path("/inc/search-route.php");
+require get_theme_file_path("/inc/like-route.php");
 
 function uni_resources()
 {
@@ -124,6 +125,10 @@ function uni_custom_rest()
     register_rest_field('post', 'author_name', array(
         'get_callback' => function() {return get_the_author();}
     ));
+
+    register_rest_field('note', 'user_note_count', array(
+        'get_callback' => function() {return count_user_posts(get_current_user_id(), 'note');}
+    ));
 }
 add_action('rest_api_init', 'uni_custom_rest');
 
@@ -168,4 +173,27 @@ add_filter('login_headertitle', 'ourLoginTitle');
 function ourLoginTitle()
 {
     return get_bloginfo('name');
+}
+
+// Force Note Posts to be Private : 10 priority leve(default); 2 args limit
+add_filter('wp_insert_post_data', 'make_note_private', 10, 2);
+function make_note_private($data, $postarr)
+{
+    // To filter html js content
+    if($data['post_type'] == 'note')
+    {
+        if(count_user_posts( get_current_user_id(), 'note' ) > 4 AND !$postarr['ID'])
+        {
+            die("You have reached your note limit.");
+        }
+
+        $data['post_content'] = sanitize_textarea_field($data['post_content']);
+        $data['post_title'] = sanitize_text_field($data['post_title']);
+    }
+
+    if($data['post_type'] == 'note' AND $data['post_status'] != 'trash')
+    {
+        $data['post_status'] = "private";
+    }
+    return $data;
 }

@@ -786,3 +786,49 @@ register_post_type('event', array(
     
 ```
 
+## WP Private Posts
+```javascript
+// POST request data to create a new request
+
+// On client side
+// Not secure
+var newPost = {
+    'title': $(".new-note-title").val(),
+    ...
+    'status': 'private',
+    // Private=Not visible publically
+    // Publlish=Visible to Public
+    // Draft=(default) in draft
+}
+
+// Server side Robust and more secure
+// Force Note Posts to be Private
+add_filter('wp_insert_post_data', 'make_note_private');
+function make_note_private($data)
+{
+    if($data['post_type'] == 'note' AND $data['post_status'] != 'trash')
+    {
+        $data['post_status'] = "private";
+    }
+    return $data;
+}
+
+// !! It'll display title with 'Private:' at the start to fix that
+str_replace("Private:", "", esc_attr(get_the_title()) );
+
+```
+
+## WP Post Limit For Each User
+
+```php
+// To filter html js content
+if($data['post_type'] == 'note')
+{
+    if(count_user_posts( get_current_user_id(), 'note' ) > 4 AND !$postarr['ID'])
+    {
+        die("You have reached your note limit.");
+    }
+...
+
+```
+

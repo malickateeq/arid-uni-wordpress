@@ -54,9 +54,17 @@ class MyNotes
             url: uni_data.root_url+'/wp-json/wp/v2/note/'+thisNote.data("id"),
             type: 'DELETE',
             success: (response)=>{
+                console.log('success');
+                console.log(response);
                 thisNote.slideUp();
+                if(response.user_note_count < 5)
+                {
+                    $(".note-limit-message").removeClass("active");
+                }
             },
             error: (response)=>{
+                console.log('error');
+                console.log(response);
             },
         });
     }
@@ -78,9 +86,12 @@ class MyNotes
             data: updatedPost,
             success: (response)=>{
                 this.make_note_readonly(thisNote);
+                console.log('success');
+                console.log(response);
             },
             error: (response)=>{
-
+                console.log('error');
+                console.log(response);
             },
         });
     }
@@ -90,7 +101,7 @@ class MyNotes
         var newPost = {
             'title': $(".new-note-title").val(),
             'content': $(".new-note-body").val(),
-            'status': 'publish',
+            'status': 'private',
         }
         // $.getJSON(''); // For GET request
         $.ajax({
@@ -101,6 +112,8 @@ class MyNotes
             type: 'POST',
             data: newPost,
             success: (response)=>{
+                console.log('success');
+                console.log(response);
                 $(".new-note-title, .new-note-body").val('');
                 $(`
                     <li data-id="${response.id}">
@@ -114,7 +127,12 @@ class MyNotes
                 .prependTo("#my-notes").hide().slideDown();
             },
             error: (response)=>{
-
+                console.log('error');
+                console.log(response);
+                if(response.responseText == 'You have reached your note limit.')
+                {
+                    $(".note-limit-message").addClass('active');
+                }
             },
         });
     }
