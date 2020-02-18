@@ -832,3 +832,101 @@ if($data['post_type'] == 'note')
 
 ```
 
+## Deploying WP Website
+
+### Direct way: Plugin
+
+1. Local Settings:
+- Although there is an option in admin panel Tools > Export/Import But It'll not include everything 
+- For complete export we rather use an plugin.
+- Plugin: All-in-One WP Migration by ServMask
+- Then in admin panel choose: All-in-One WP Migration > Export
+- Select Export to 'FILE'
+
+2. Server Setup
+- Install a fresh WP in your server folder where local site will be placed
+- Install this plugin All-in-One WP Migration
+- Then All-in-One WP Migration > Import > File then select the above exported file
+- After successfully importing, Go to settings > permalinks and refresh then click save changes (2 times)
+- Your site is deployed now.
+
+### Deployed via Git - Manual Deployment
+
+1. Database shifting:
+- The first thing we need to do is to replace all URLs 'localsite.test' to 'livesite.com' in the database
+- We can do this in text editor by manually replacing OR if DB is huge we can get help via a tiny plugin
+
+- "WP Migrate DB By Delicious Brains" Install this plugin.
+- Goto Tools > Migrate DB
+- Select appropriate settings and click export
+- Use/import this DB to server.
+
+- Replace DB credentails in root file 'config.php' of WP
+- To use the same file for local and live server
+
+- create a new file local.php in root folder then
+```php
+if(file_exists(dirname(__FILE__).'/local.php') )
+{
+    // Local Database Settings
+	define( 'DB_NAME', 'arid_db' );
+	define( 'DB_USER', 'root' );
+	define( 'DB_PASSWORD', '' );
+	define( 'DB_HOST', 'localhost' );
+}
+else
+{
+    // Live Database Settings
+	define( 'DB_NAME', 'myahmed_arid' );
+	define( 'DB_USER', 'myahmed_malik' );
+	define( 'DB_PASSWORD', '@teeQ786' );
+	define( 'DB_HOST', 'localhost' );
+}
+```
+
+- Push the project to Git or Bitbucket
+    ![Git+Cpanel](https://medium.com/@ridbay/how-to-deploy-your-github-repositories-to-cpanel-the-easier-way-16ec6e6cc7ee)
+
+## WP Create a Basic Plugin
+- Create a new folder in Plugins folder
+- Create a PHP file init
+    "my-plugin.php"
+```php
+/*
+Plugin Name: My Plugin
+Description: 123
+*/
+// Your manipulation code here
+
+// We can do many aamazing things whith these two functions
+add_filter();
+add_action();
+
+add_filter('the_content', 'myContent');
+function myContent($content)
+{
+    $content = str_replace('malik ateeq', '*****',$content);
+    return $content;
+}
+
+```
+
+- Use shortcodes in Plugins
+- In shortcodes we can add dynamic content while creating a post like; [myTotalRevenue] 
+- Now in plugin do this
+```php
+    add_shortcode('myTotalRevenue', 'revenue_count');
+    function revenue_count()
+    {
+        // My query
+        return 3+2;
+    }
+```
+- For more info related plugins learn following from WP
+```php
+    add_menu_page();
+    add_option();
+    get_option();
+    update_option();
+    delete_option();
+```
